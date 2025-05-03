@@ -28,7 +28,7 @@ public:
 	UMultiplayerSessionsSubsystem();
 
 	// To handle session functionality, The Menu calss will call this
-	void CreateSession(int32 NumPublicConnections, FString MatchType);
+	void CreateSession(int32 NumberOfPublicConnections, FString MatchType);
 	void FindSessions(int32 MaxSearchResults);
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
@@ -68,4 +68,8 @@ private:
 	FDelegateHandle						DestroySessionCompleteDelegateHandle;
 	FOnStartSessionCompleteDelegate		StartSessionCompleteDelegate;
 	FDelegateHandle						StartSessionCompleteDelegateHandle;
+
+	bool	bCreateSessionOnDestroy		{false};
+	int32	LastNumberOfPublicConnections	{0};
+	FString LastMatchType				{TEXT("")};
 };

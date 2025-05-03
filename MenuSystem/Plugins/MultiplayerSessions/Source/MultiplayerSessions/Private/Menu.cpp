@@ -7,10 +7,11 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
-void UMenu::MenuSetup(int32 InNumberOfPublicConnections, FString InMatchType)
+void UMenu::MenuSetup(int32 InNumberOfPublicConnections, FString InMatchType, FString InPathToLobby)
 {
 	this->NumberOfPublicConnections = InNumberOfPublicConnections;
 	this->MatchType = InMatchType;
+	this->PathToLobby = FString::Printf(TEXT("%s?listen"), *InPathToLobby);
 
 	AddToViewport();
 	SetVisibility(ESlateVisibility::Visible);
@@ -69,6 +70,7 @@ bool UMenu::Initialize()
 
 void UMenu::HostButtonClicked()
 {
+	HostButton->SetIsEnabled(false);
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->CreateSession(NumberOfPublicConnections, MatchType);
@@ -77,6 +79,7 @@ void UMenu::HostButtonClicked()
 
 void UMenu::JoinButtonClicked()
 {
+	JoinButton->SetIsEnabled(false);
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->FindSessions(1000);
@@ -123,7 +126,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			World->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");
+			World->ServerTravel(PathToLobby);
 		}
 	}
 	else
@@ -137,6 +140,8 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 				TEXT("Session Creation Failed")
 			);
 		}
+
+		HostButton->SetIsEnabled(true);
 	}
 }
 
@@ -156,6 +161,32 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SearchResul
 			Result.Session.SessionSettings.bUseLobbiesIfAvailable = true;
 			MultiplayerSessionsSubsystem->JoinSession(Result);
 			return;
+		}
+	}
+
+	if (!bWasSuccessful || SearchResults.Num() == 0)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				TEXT("No Session Found")
+			);
+		}
+		JoinButton->SetIsEnabled(true);
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Green,
+				TEXT("Session Found")
+			);
 		}
 	}
 }
@@ -178,6 +209,32 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 			}
 		}
 	}
+
+	if (Result != EOnJoinSessionCompleteResult::Success)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				TEXT("Join Session Failed")
+			);
+		}
+		JoinButton->SetIsEnabled(true);
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Green,
+				TEXT("Join Session Success")
+			);
+		}
+	}
 }
 
 void UMenu::OnDestroySession(bool bWasSuccessful)
@@ -187,5 +244,28 @@ void UMenu::OnDestroySession(bool bWasSuccessful)
 
 void UMenu::OnStartSession(bool bWasSuccessful)
 {
-
+	if (bWasSuccessful)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Green,
+				TEXT("Session Started Successfully")
+			);
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				TEXT("Session Start Failed")
+			);
+		}
+	}
 }
