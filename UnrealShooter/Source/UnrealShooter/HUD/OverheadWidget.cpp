@@ -3,6 +3,7 @@
 
 #include "OverheadWidget.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/PlayerState.h"
 
 void UOverheadWidget::SetDisplayText(FString TextToDisplay)
 {
@@ -12,19 +13,22 @@ void UOverheadWidget::SetDisplayText(FString TextToDisplay)
 	}
 }
 
-void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
+void UOverheadWidget::ShowPlayerName(APawn* InPawn)
 {
-	ENetRole LocalRole = InPawn->GetLocalRole();
-	FString Role;
-	switch (LocalRole)
-	{
-		case ENetRole::ROLE_None:				Role = FString("None"); break;
-		case ENetRole::ROLE_SimulatedProxy:		Role = FString("SimulatedProxy"); break;
-		case ENetRole::ROLE_AutonomousProxy:	Role = FString("AutonomousProxy"); break;
-		case ENetRole::ROLE_Authority:			Role = FString("Authority"); break;
-	}
-	FString LocalRoleString = FString::Printf(TEXT("Local Role: %s"), *Role);
-	SetDisplayText(LocalRoleString);
+    if (!IsValid(InPawn)) 
+    { 
+        SetDisplayText(TEXT("")); 
+        return; 
+    }
+
+    APlayerState* PlayerState = InPawn->GetPlayerState();
+    if (!IsValid(PlayerState))
+    {
+        SetDisplayText(TEXT(""));
+        return;
+    }
+
+    SetDisplayText(PlayerState->GetPlayerName());
 }
 
 void UOverheadWidget::NativeDestruct()
