@@ -106,8 +106,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input	)
 	UInputAction* ReloadAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input	)
-	UInputAction* DashAction;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input	)
 	UInputAction* ThrowGrenadeAction;
 	
 	void MoveForward(const FInputActionValue& Value);
@@ -120,7 +118,6 @@ protected:
 	void FireButtonPressed(const FInputActionValue& Value);
 	void ReloadButtonPressed(const FInputActionValue& Value);
 	virtual void Jump() override;
-	void DashButtonPressed(const FInputActionValue& Value);
 	void GrenadeButtonPressed();
 	void DropOrDestroyWeapon(AWeapon* Weapon);
 	void DropOrDestroyWeapons();
@@ -130,13 +127,6 @@ protected:
 	
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
-
-	
-	UPROPERTY(EditAnywhere, Category= Dash)
-	float DashForce = 1.f;
-	UPROPERTY(EditAnywhere, Category= Dash)
-	float DashDelay = 1.f;
-	void DashTimerFinished();
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
@@ -247,9 +237,6 @@ private:
 
 	ETurningInPlace TurningInPlace;
 	void TurnInPlace(float DeltaTime);
-
-	bool bPreventDash;
-	FTimerHandle DashTimer;
 
 	
 	/**

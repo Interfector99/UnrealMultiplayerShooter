@@ -32,16 +32,22 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 				if (InstigatorPawn->IsLocallyControlled()) // server, host - use replicated projectile
 				{
 					SpawnedProjectile = World->SpawnActor<AProjectile>(ProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-					SpawnedProjectile->bUseServerSideRewind = false;
-					SpawnedProjectile->FiringWeapon = this;
-					SpawnedProjectile->Damage = Damage;
-					SpawnedProjectile->HeadShotDamage = HeadShotDamage;
+					if (SpawnedProjectile)
+					{
+						SpawnedProjectile->bUseServerSideRewind = false;
+						SpawnedProjectile->FiringWeapon = this;
+						SpawnedProjectile->Damage = Damage;
+						SpawnedProjectile->HeadShotDamage = HeadShotDamage;
+					}
 				}
 				else // server, not locally controlled - spawn non-replicated projectile, SSR
 				{
 					SpawnedProjectile = World->SpawnActor<AProjectile>(ServerSideRewindProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-					SpawnedProjectile->bUseServerSideRewind = true;
-					SpawnedProjectile->FiringWeapon = this;
+					if (SpawnedProjectile)
+					{
+						SpawnedProjectile->bUseServerSideRewind = true;
+						SpawnedProjectile->FiringWeapon = this;
+					}
 				}
 			}
 			else // client, using SSR
@@ -49,16 +55,22 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 				if (InstigatorPawn->IsLocallyControlled()) // client, locally controlled - spawn non-replicated projectile, use SSR
 				{
 					SpawnedProjectile = World->SpawnActor<AProjectile>(ServerSideRewindProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-					SpawnedProjectile->bUseServerSideRewind = true;
-					SpawnedProjectile->TraceStart = SocketTransform.GetLocation();
-					SpawnedProjectile->InitialVelocity = SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
-					SpawnedProjectile->FiringWeapon = this;
+					if (SpawnedProjectile)
+					{
+						SpawnedProjectile->bUseServerSideRewind = true;
+						SpawnedProjectile->TraceStart = SocketTransform.GetLocation();
+						SpawnedProjectile->InitialVelocity = SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
+						SpawnedProjectile->FiringWeapon = this;
+					}
 				}
 				else // client, not locally controlled - spawn non-replicated projectile, no SSR
 				{
 					SpawnedProjectile = World->SpawnActor<AProjectile>(ServerSideRewindProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-					SpawnedProjectile->bUseServerSideRewind = false;
-					SpawnedProjectile->FiringWeapon = this;
+					if (SpawnedProjectile)
+					{
+						SpawnedProjectile->bUseServerSideRewind = false;
+						SpawnedProjectile->FiringWeapon = this;
+					}
 				}
 			}
 		}
@@ -67,10 +79,13 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 			if (InstigatorPawn->HasAuthority())
 			{
 				SpawnedProjectile = World->SpawnActor<AProjectile>(ProjectileClass, SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-				SpawnedProjectile->bUseServerSideRewind = false;
-				SpawnedProjectile->Damage = Damage;
-				SpawnedProjectile->HeadShotDamage = HeadShotDamage;
-				SpawnedProjectile->FiringWeapon = this;
+				if (SpawnedProjectile)
+				{
+					SpawnedProjectile->bUseServerSideRewind = false;
+					SpawnedProjectile->Damage = Damage;
+					SpawnedProjectile->HeadShotDamage = HeadShotDamage;
+					SpawnedProjectile->FiringWeapon = this;
+				}
 			}
 		}
 	}

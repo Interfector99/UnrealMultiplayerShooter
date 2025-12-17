@@ -528,7 +528,6 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered , this, &ThisClass::AimButtonPressed);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered , this, &ThisClass::FireButtonPressed);
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered , this, &ThisClass::ReloadButtonPressed);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered , this, &ThisClass::DashButtonPressed);
 		EnhancedInputComponent->BindAction(ThrowGrenadeAction, ETriggerEvent::Triggered , this, &ThisClass::GrenadeButtonPressed);
 	}
 }
@@ -719,27 +718,6 @@ void ABlasterCharacter::Jump()
 	}
 }
 
-void ABlasterCharacter::DashButtonPressed(const FInputActionValue& Value)
-{
-	if (CombatComponent && CombatComponent->bHoldingTheFlag) return;
-
-	if (bPreventDash)
-	{
-		return;
-	}
-	//GetLastMovementInputVector();
-	LaunchCharacter(GetVelocity().GetSafeNormal() * DashForce,false,false);
-	bPreventDash = true;
-
-	//Start Dash delay Timer
-	GetWorldTimerManager().SetTimer(
-		DashTimer,
-		this,
-		&ThisClass::DashTimerFinished,
-		DashDelay
-	);
-}
-
 void ABlasterCharacter::GrenadeButtonPressed()
 {
 	if (CombatComponent)
@@ -747,11 +725,6 @@ void ABlasterCharacter::GrenadeButtonPressed()
 		if (CombatComponent && CombatComponent->bHoldingTheFlag) return;
 		CombatComponent->ThrowGrenade();
 	}
-}
-
-void ABlasterCharacter::DashTimerFinished()
-{
-	bPreventDash = false;
 }
 
 void ABlasterCharacter::EquipButtonPressed(const FInputActionValue& Value)
